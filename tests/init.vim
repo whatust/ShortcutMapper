@@ -236,7 +236,8 @@ vmap <C-s> :Tabular /
 " Normal Mode
 
 " Vertical split
-nnoremap <silent> vv <C-w>v
+"nnoremap <silent> vv "<C-w>v
+nnoremap <silent> vv :vs<CR>
 
 " Remove trailing whitespaces
 nmap <F2> :%s/\s\+$//e <CR>

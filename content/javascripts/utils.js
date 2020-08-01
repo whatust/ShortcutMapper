@@ -1,9 +1,9 @@
 
 function Utils() {
     "use strict";
-    
+
     this.self = this;
-    
+
     this.standardModClasses = ["nomod", "alt", "command", "control", "shift", "multi", "other"];
 
     // Maps byte to names defined in /shmaplib/keynames
@@ -113,7 +113,7 @@ function Utils() {
         221: "RIGHT_BRACKET",
         222: "SINGLE_QOUTE"
     };
-    
+
 };
 
 window.utils = new Utils();

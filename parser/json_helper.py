@@ -1,7 +1,8 @@
 import json
+
 from util import eprint
 
-class keyboad_json:
+class keyboard_json:
 
     def __init__(self, name, version, os, mods_used, default_context, verbose):
 
@@ -34,17 +35,21 @@ class keyboad_json:
         if self.verbose > 1:
             print(json.dumps(self.json, indent=2, sort_keys=True))
 
-    def export_json(path):
+    def export_json(self, path):
 
         if self.verbose > 0:
             print("Saving JSON to {}".format(path))
-            print(json.dump(self.json, indent=2, sort_keys=True))
+            print(json.dumps(self.json, indent=2, sort_keys=True))
 
-        json.dump(self.json, path, indent=2, sort_keys=True)
+        with open(path, "w") as file:
+            json.dump(self.json, file, indent=2, sort_keys=True)
+
+    def print_json(self):
+        print(json.dumps(self.json, indent=2, sort_keys=True))
 
 if __name__ == "__main__":
 
-    my_key = keyboad_json("vim", "1.0", "linux", ["CONTROL", "SHIFT"], "Global", 2)
+    my_key = keyboard_json("vim", "1.0", "linux", ["CONTROL", "SHIFT"], "Global", 2)
 
     my_key.insert_shortcut_key("Normal", "F", ["CONTROL"], "Page Down")
     my_key.insert_shortcut_key("Normal", "F", ["CONTROL"], "Page Down")

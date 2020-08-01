@@ -3,28 +3,31 @@ import re
 from json_helper import keyboard_json
 from util import translate_key
 
-def parse_vim(filename, verbose, export_filename):
+def parse_tmux(filename, verbose, export_filename):
 
     file = open(filename, 'r')
-    jsondata = keyboard_json("vim", "1.0", "linux", ["CONTROL", "SHIFT"], "Global", verbose)
+    jsondata = keyboard_json("tmux", "1.0", "linux", ["CONTROL", "ALT"], "Global", verbose)
 
-    vim_regex = re.compile(r"^\s*(?P<context>[nvi])?(nore)?map\s+(<silent>)?\s*(<expr>)?\s*<?(?P<mod>[CAS]-[CAS]|[CAS])?-?(?P<key>[^\s>-]*)>?\s+(?P<command>.*)")
-
-    _context = {'g':"Global", 'v':"Verbose", 'n':"Normal", 'i':"Insert"}
+    tmux_regex = re.compile(r"^\s*bind-key(\s+-.)*(\s+(?P<context>copy-mode-vi|edit-mode-vi))?\s+(?P<mod>([^-]-)*)(?P<key>[^ ]+)\s+(?P<command>.+)")
 
     for line in file:
 
-        match = vim_regex.search(line)
+        match = tmux_regex.search(line)
 
         if match is not None:
-            context = match.group("context")
+
             key = match.group("key")
             command = match.group("command")
+            context = match.group("context")
             mod = match.group("mod")
 
             if context is None:
-                context = "g"
-            context = _context[context]
+                context = "Global"
+            else:
+                if context == "copy-mode-vi":
+                    context = "Copy"
+                elif context == "edit-mode-vi":
+                    context = "Edit"
 
             if mod is None:
                 mod = []
@@ -33,10 +36,8 @@ def parse_vim(filename, verbose, export_filename):
 
                 if "C" in mod:
                     _mod.append("CONTROL")
-                if "A" in mod:
+                if "M" in mod:
                     _mod.append("ALT")
-                if "S" in mod:
-                    _mod.append("SHIFT")
 
                 mod = _mod
 
@@ -50,14 +51,14 @@ def parse_vim(filename, verbose, export_filename):
             if verbose > 1:
                 print(context + " " + str(mod) + " " + key + " " + command)
 
-            jsondata.insert_shortcut_key(context, key, mod, command)
+            #jsondata.insert_shortcut_key(context, key, mod, command)
 
-    if verbose > 0:
-        jsondata.print_json()
+    #if verbose > 0:
+        #jsondata.print_json()
 
     jsondata.export_json(export_filename)
 
 if __name__ == "__main__":
 
-    parse_vim("../tests/init.vim", 1, "../content/generated/vim_1.0_linux.json")
+    parse_tmux("../tests/tmux.conf", 2, "../content/generated/tmux_1.0_linux.json")
 

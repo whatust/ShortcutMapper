@@ -38,3 +38,5 @@ nbproject
 .hg
 .svn
 .idea
+
+content/generated/*
