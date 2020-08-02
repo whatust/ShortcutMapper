@@ -1,3 +1,5 @@
+/*VERSION:1.1*/
+/*OS:linux*/
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */

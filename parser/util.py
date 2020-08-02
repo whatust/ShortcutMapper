@@ -18,6 +18,13 @@ class _color:
     SUCCESS = "\033[92m"
     END = "\033[0m"
 
+def command_truncate(command):
+
+    if(len(command) > 15):
+        command = command[:12] + "..."
+
+    return command
+
 def translate_key(key):
 
     if key.lower() in key_translation:
@@ -26,7 +33,6 @@ def translate_key(key):
     eprint("Unsupported key:{}".format(key), "warning")
 
     return ""
-    
 
 key_translation = {
         "bs":"BACKSPACE",
@@ -67,8 +73,8 @@ key_translation = {
         "grave":"ACCENT_GRAVE",
         "page_up":"PAGE_UP",
         "page_down":"PAGE_DOWN",
-        "print":"PRINT_SCREEN"
+        "print":"PRINT_SCREEN",
+        ",":"COMMA",
+        "num_lock":"NUMLOCK"
         }
-
-
 

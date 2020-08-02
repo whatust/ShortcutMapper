@@ -3,17 +3,20 @@ import sys
 
 from vim_parser import parse_vim
 from dwm_parser import parse_dwm
+from tmux_parser import parse_tmux
 
-def controler(args):
+def controler(filename, config_type,  verbose):
 
-    #config_type = config_identify(args.file);
-    config_type = "dwm"
+    directory_path = "../content/generated"
 
     if config_type == "vim":
-        parse_vim(args.file, args.verbose)
+        parse_vim(args.file, args.verbose, directory_path)
 
     if config_type == "dwm":
-        parse_dwm(args.file, args.verbose)
+        parse_dwm(args.file, args.verbose, directory_path)
+
+    if config_type == "tmux":
+        parse_tmux(args.file, args.verbose, directory_path)
 
 if __name__ == "__main__":
 
@@ -24,5 +27,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    controler(args)
+    #config_type = config_identify(args.file);
+
+    controler(args.file, "vim", args.verbose)
+    #controler(args.file, "dwm", args.verbose)
+    #controler(args.file, "tmux", args.verbose)
 

@@ -1,3 +1,5 @@
+"VERSION:1.1
+"OS:linux
 " Ward off unexpectable
 set nocompatible
 filetype off

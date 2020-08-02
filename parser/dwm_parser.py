@@ -1,22 +1,36 @@
+from os.path import basename
+from os.path import join
 import re
 
 from json_helper import keyboard_json
+from json_helper import update_apps
 from util import translate_key
+from util import command_truncate
 
-def parse_dwm(filename, verbose, export_filename):
+def parse_dwm(filename, verbose, directory_path):
 
+    application = "dwm"
     file = open(filename, 'r')
+    jsondata = keyboard_json("dwm", ["OSKEY", "CONTROL", "SHIFT", "ALT"], "Global", verbose)
 
+    ver_regex = re.compile(r"\/\*VERSION:(?P<version>[^\s]+)\*\/")
+    os_regex = re.compile(r"\/\*OS:(?P<os>[^\s]+)\*\/")
     dwm_regex = re.compile(r"^\s*\{\s*(?P<mod>0|((MODKEY)(\|ShiftMask)?(\|Mod4Mask)?(\|ControlMask)?))\s*,\s*XK_(?P<key>[^\s]+)\s*,\s*(?P<precommand>[^\s]+)\s*,\s*(?P<command>.+)\s*\}.*")
 
     context = "Global"
     shcmd_regex = re.compile(r"^SHCMD\(\"(?P<command>.*)\"\)")
-    jsondata = keyboard_json("dwm", "1.0", "linux", ["OSKEY", "CONTROL", "SHIFT", "ALT"], "Global", verbose)
 
     for line in file:
 
-        match = dwm_regex.search(line)
+        match = os_regex.search(line)
+        if match is not None:
+            jsondata.json["os"] = match.group("os")
 
+        match = ver_regex.search(line)
+        if match is not None:
+            jsondata.json["version"] = match.group("version")
+
+        match = dwm_regex.search(line)
         if match is not None:
 
             mod = match.group("mod")
@@ -30,6 +44,8 @@ def parse_dwm(filename, verbose, export_filename):
                 command = match.group("command")
             else:
                 command = precommand + command
+
+            command = command_truncate(command)
 
             _mod = []
             if "MODKEY" in mod:
@@ -57,10 +73,16 @@ def parse_dwm(filename, verbose, export_filename):
     if verbose > 0:
         jsondata.print_json()
 
-    jsondata.export_json(export_filename)
+    export_filename = application+"_"+jsondata.json["version"]+"_"+\
+                        jsondata.json["os"]+".json"
+
+    jsondata.export_json(join(directory_path, export_filename))
+
+    update_apps(join(directory_path, "apps.js"), application,
+                jsondata.json["version"], jsondata.json["os"], export_filename)
 
 if __name__ == "__main__":
 
-    parse_dwm("../tests/config.h", 1, "../content/generated/dwm_1.0_linux.json")
+    parse_dwm("../tests/dwm_config.h", 0, "../content/generated")
 
 

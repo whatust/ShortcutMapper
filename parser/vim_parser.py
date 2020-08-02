@@ -1,26 +1,52 @@
+from os.path import basename
+from os.path import join
 import re
 
 from json_helper import keyboard_json
+from json_helper import update_apps
 from util import translate_key
+from util import command_truncate
 
-def parse_vim(filename, verbose, export_filename):
+def parse_vim(filename, verbose, directory_path):
 
+    application = "vim"
     file = open(filename, 'r')
-    jsondata = keyboard_json("vim", "1.0", "linux", ["CONTROL", "SHIFT"], "Global", verbose)
+    jsondata = keyboard_json(application, ["CONTROL", "SHIFT", "ALT"], "Global", verbose)
 
-    vim_regex = re.compile(r"^\s*(?P<context>[nvi])?(nore)?map\s+(<silent>)?\s*(<expr>)?\s*<?(?P<mod>[CAS]-[CAS]|[CAS])?-?(?P<key>[^\s>-]*)>?\s+(?P<command>.*)")
+    ver_regex = re.compile(r"^\"VERSION:(?P<version>[^\s]+)")
+    os_regex = re.compile(r"^\"OS:(?P<os>[^\s]+)")
+    leader_regex = re.compile(r"^let\s+mapleader\s+=\s+\"(?P<leader>.)\"")
+
+    vim_regex = re.compile(r"^\s*(?P<context>[nvi])?(nore)?map\s+(?P<leader><Leader>)?(<silent>)?\s*(<expr>)?\s*<?(?P<mod>[CAS]-[CAS]|[CAS])?-?(?P<key>[^\s>-]*)>?\s+(?P<command>.*)")
 
     _context = {'g':"Global", 'v':"Verbose", 'n':"Normal", 'i':"Insert"}
 
     for line in file:
 
-        match = vim_regex.search(line)
-
+        match = os_regex.search(line)
         if match is not None:
-            context = match.group("context")
+            jsondata.json["os"] = match.group("os")
+
+        match = ver_regex.search(line)
+        if match is not None:
+            jsondata.json["version"] = match.group("version")
+
+        match = leader_regex.search(line)
+        if match is not None:
+            leader = match.group("leader")
+            leader = translate_key(leader)
+            jsondata.json["mods_used"].append(leader)
+
+        match = vim_regex.search(line)
+        if match is not None:
             key = match.group("key")
-            command = match.group("command")
             mod = match.group("mod")
+
+            if match.group("leader"):
+                mod = "L"
+
+            context = match.group("context")
+            command = command_truncate(match.group("command"))
 
             if context is None:
                 context = "g"
@@ -37,6 +63,8 @@ def parse_vim(filename, verbose, export_filename):
                     _mod.append("ALT")
                 if "S" in mod:
                     _mod.append("SHIFT")
+                if "L" in mod:
+                    _mod.append(leader)
 
                 mod = _mod
 
@@ -55,9 +83,15 @@ def parse_vim(filename, verbose, export_filename):
     if verbose > 0:
         jsondata.print_json()
 
-    jsondata.export_json(export_filename)
+    export_filename = application+"_"+jsondata.json["version"]+"_"+\
+                        jsondata.json["os"]+".json"
+
+    jsondata.export_json(join(directory_path, export_filename))
+
+    update_apps(join(directory_path, "apps.js"), application,
+                jsondata.json["version"], jsondata.json["os"], export_filename)
 
 if __name__ == "__main__":
 
-    parse_vim("../tests/init.vim", 1, "../content/generated/vim_1.0_linux.json")
+    parse_vim("../tests/init.vim", 0, "../content/generated")
 
