@@ -1,0 +1,6 @@
+Aplication.o: Aplication.cpp Aplication.h Types.h
+main.o: main.cpp Parser.h Aplication.h Types.h Util.h
+Parser.o: Parser.cpp Parser.h Aplication.h Types.h Util.h
+Planner.o: Planner.cpp Planner.h Aplication.h Types.h
+Types.o: Types.cpp Types.h
+Util.o: Util.cpp Util.h
