@@ -69,7 +69,7 @@ function Utils() {
         88: "X",
         89: "Y",
         90: "Z",
-        91: "COMMAND",
+        91: "OSKEY",
         93: "COMMAND",
         224: "COMMAND",
         96: "NUMPAD_ZERO",
