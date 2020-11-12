@@ -861,6 +861,15 @@ div#keyboard button.mod-other.mod-active {
                 0px 2px 3px 0px rgba(0, 0, 0, 0.5);
 }
 
+div#keyboard button.mod-conf:active,
+div#keyboard button.mod-conf.mod-active {
+    background: #dd0000;
+    box-shadow: inset 0px 0px 0px 1px #bb0000,
+                inset 0px 0px 0px 2px #dd0000,
+                0px 1px 0px 0px #cc0000,
+                0px 2px 0px 0px #aa0000,
+                0px 2px 3px 0px rgba(0, 0, 0, 0.5);
+}
 
 
 /*** SEARCHBOX *****************************************************/
